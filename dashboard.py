@@ -6,11 +6,12 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 # Load Data
-data_pnbp = pd.read_csv('Data/pnbp.csv')
-data_hutan = pd.read_csv('Data/kawasan_hutan.csv')
-data_ekspor = pd.read_csv('Data/ekspor.csv')
-data_produksi_bulat = pd.read_csv('Data/produksi_kayu_bulat.csv')
-data_produksi_olahan = pd.read_csv('Data/produksi_kayu_olahan.csv')
+data_pnbp = pd.read_csv('Dataset/pnbp.csv')
+data_hutan = pd.read_csv('Dataset/kawasan_hutan.csv')
+data_ekspor = pd.read_csv('Dataset/ekspor.csv')
+data_produksi_bulat = pd.read_csv('Dataset/produksi_kayu_bulat.csv')
+data_produksi_olahan = pd.read_csv('Dataset/produksi_kayu_olahan.csv')
+data_pemenuhan_bb = pd.read_csv('Dataset/pemenuhan_bahan_baku.csv')
 
 # Define Thresholds
 threshold_hutan = 100000  # Menentukan batas kawasan hutan yang dianggap besar
