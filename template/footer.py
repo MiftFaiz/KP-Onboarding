@@ -49,7 +49,8 @@ footer = dbc.Navbar(
                     width="auto",
                 ),
             ),
-        ]
+        ],
+        
     ),
     color="light",
     className="fixed-bottom",

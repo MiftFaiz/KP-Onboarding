@@ -50,3 +50,15 @@ kawasan_pnbp = pd.merge(new_pnbp, kawasan, how='left', on=['provinsi'])
 kawasan_pnbp.fillna(0, inplace=True)
 
 unique_products = data_ekspor['produk'].unique()
+
+unique_jenis_bb = data_pemenuhan_bb['jenis'].unique()
+
+unique_jenis_olahan = data_produksi_olahan['jenis'].unique()
+
+available_provinces = kawasan_pnbp['provinsi'].unique().tolist()
+
+data_pnbp["provinsi"] = data_pnbp["provinsi"].replace(["Kalimantan Timur"], "Kalimantan Timur dan Utara")
+data_pnbp["provinsi"] = data_pnbp["provinsi"].replace(["Kalimantan Utara"], "Kalimantan Timur dan Utara")
+new_pnbp = data_pnbp.groupby(["tahun", "bulan", "provinsi", "jenis"], sort=False)["pnbp"].sum().reset_index()
+new_pnbp = new_pnbp.drop(new_pnbp[(new_pnbp['tahun'] == 2023) & (new_pnbp['bulan'].isin(['Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']))].index)
+pnbp_tahunan = new_pnbp.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
