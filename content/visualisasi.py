@@ -14,3 +14,4 @@ def generate_figure(provinsi):
         yaxis_title="PNBP"
     )
     return fig
+

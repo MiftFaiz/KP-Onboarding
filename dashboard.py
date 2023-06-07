@@ -5,6 +5,7 @@ import dash_core_components as dcc
 from template.navbar import navbar
 from template.footer import footer
 from content.v_data import content as data
+from content.v_data import table_produk_ekspor_layout as table_ekspor
 from content.v_home import layout as home
 from content.visualisasi import generate_figure
 import dash
@@ -12,6 +13,21 @@ import dash
 
 # Buat layout dashboard dengan Dash
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+table_layout = dbc.Container(
+    [
+        navbar,
+        dbc.Row(
+            [
+                dbc.Col(table_ekspor, width=6),
+                #dbc.Col(table_produksi, width=6)
+            ],
+            className="mt-4"
+        ),
+        footer,
+    ],
+    fluid=True
+)
 
 data_layout = html.Div(
     style={
@@ -58,6 +74,8 @@ def display_page(pathname):
         return data_layout
     if pathname == '/home':
         return home_layout
+    if pathname == '/table':
+        return table_layout
     else:
         return '404 - Halaman tidak ditemukan'
 

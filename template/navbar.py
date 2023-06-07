@@ -16,6 +16,7 @@ navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Home", href="home")),
         dbc.NavItem(dbc.NavLink("Data", href="data")),
+        dbc.NavItem(dbc.NavLink("Table", href="table")),
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Action", href="#"),
