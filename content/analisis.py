@@ -16,7 +16,7 @@ data_produksi_olahan["provinsi"] = data_produksi_olahan["provinsi"].replace(["Da
 data_produksi_olahan["provinsi"] = data_produksi_olahan["provinsi"].replace(["Aceh"], "Nangroe Aceh Darussalam")
 
 # Menghilangkan jenis dan sum volumenya lalu grupkan berdasarkan tahun bulan dan provinsi
-sum_olahan = data_produksi_olahan.groupby(['tahun', 'bulan', 'provinsi'], sort=False).sum().reset_index()
+sum_olahan = data_produksi_olahan.groupby(['tahun', 'bulan', 'provinsi'], sort=False)["volume"].sum().reset_index()
 sum_bulat = data_produksi_bulat.drop("kelompok", axis=1).groupby(["tahun", "bulan", "provinsi"], sort=False)["volume"].sum().reset_index()
 
 # Membenarkan nama provinsi
@@ -27,6 +27,7 @@ produksi = pd.merge(sum_olahan, sum_bulat, how='outer', on=['provinsi', 'bulan',
 produksi = produksi.rename(columns={'volume_x':'volume_olahan','volume_y':'volume_bulat'})
 produksi = produksi.fillna(0)
 produksi['volume'] = produksi['volume_olahan'] + produksi['volume_bulat']
+# print(produksi)
 
 pnbp = data_pnbp.copy()
 pnbp["provinsi"] = pnbp["provinsi"].replace(["Kalimantan Timur"], "Kalimantan Timur dan Utara")
@@ -35,7 +36,8 @@ pnbp["provinsi"] = pnbp["provinsi"].replace(["Kalimantan Utara"], "Kalimantan Ti
 new_pnbp = pnbp.groupby(["tahun", "bulan", "provinsi"], sort=False)["pnbp"].sum().reset_index()
 
 # Buat PNBP yang jenisnya berkaitan dengan produksi
-pnbp_produksi = pnbp.loc[(pnbp['jenis'] == 'IURAN') | (pnbp['jenis'] == 'DR')]
+# pnbp_produksi = pnbp.loc[(pnbp['jenis'] == 'IURAN') | (pnbp['jenis'] == 'DR')]
+pnbp_produksi = pnbp.copy()
 pnbp_produksi['jenis'].unique()
 
 data_kawasan['provinsi'] = data_kawasan['provinsi'].replace(['Aceh'], 'Nangroe Aceh Darussalam')
@@ -47,7 +49,7 @@ provinsi_kawasan = data_kawasan['provinsi'].unique()
 
 [x for x in provinsi_kawasan if x not in provinsi_pnbp]
 
-kawasan = kawasan.groupby(['provinsi'], sort=False).sum().reset_index()
+kawasan = kawasan.groupby(['provinsi'], sort=False)['area'].sum().reset_index()
 
 kawasan_pnbp = pd.merge(new_pnbp, kawasan, how='left', on=['provinsi'])
 kawasan_pnbp.fillna(0, inplace=True)
@@ -78,9 +80,16 @@ encoded_df = pd.DataFrame(
     )
 pnbp_produksi = pd.concat([pnbp_produksi.drop(columns=['jenis']), encoded_df], axis=1)
 
+
+pnbp_produksi['pnbp_IURAN'] = pnbp_produksi['pnbp'].loc[pnbp_produksi['jenis_IURAN'] == 1.0]
+pnbp_produksi['pnbp_DR'] = pnbp_produksi['pnbp'].loc[pnbp_produksi['jenis_DR'] == 1.0]
+pnbp_produksi['pnbp_PSDH'] = pnbp_produksi['pnbp'].loc[pnbp_produksi['jenis_PSDH'] == 1.0]
+pnbp_produksi['pnbp_DPEH'] = pnbp_produksi['pnbp'].loc[pnbp_produksi['jenis_DPEH'] == 1.0]
+pnbp_produksi.fillna(0,inplace=True)
+pnbp_produksi.drop(columns=['pnbp'], inplace=True)
 pnbp_produksi = pnbp_produksi.groupby(['provinsi', 'tahun', 'bulan'], sort=False).sum().reset_index()
 
-print(pnbp_produksi.columns)
+
 pnbp_produksi['pnbp_total'] = pnbp_produksi['pnbp_IURAN'] + pnbp_produksi['pnbp_DR'] + pnbp_produksi['pnbp_PSDH'] +pnbp_produksi['pnbp_DPEH']
 pnbp_produksi.loc[
     (pnbp_produksi['jenis_DPEH'] > 1 )|
@@ -90,7 +99,8 @@ pnbp_produksi.loc[
     (pnbp_produksi['jenis_PSDH'] > 1 ),["jenis_DR", "jenis_IURAN","jenis_DPEH","jenis_PSDH"]] = 1.0
 
 pnbp_p = pd.merge(pnbp_produksi, produksi, how='left',on=['tahun', 'bulan', 'provinsi'])
-selisih = pnbp_p['pnbp_total'] - pnbp_p['volume_total']
+pnbp_p.fillna(0, inplace=True)
+# selisih = pnbp_p['pnbp_total'] - pnbp_p['volume_total']
 
 
 pnbp_kawasan_produksi = pd.merge(pnbp_p, kawasan, how='left', on=['provinsi']).fillna(0)
@@ -104,3 +114,4 @@ scaled_data = pd.DataFrame(
     )
 
 scaled_pnbp_KP = pd.concat([pnbp_kawasan_produksi.drop(columns=scaled_data.columns), scaled_data],axis=1)
+print(scaled_pnbp_KP)
