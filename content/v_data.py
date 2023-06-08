@@ -9,25 +9,36 @@ from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
 from .visualisasi import fig_peta
 from .visualisasi import fig_3d
-from .visualisasi import fig_ked_pnbp
-from .visualisasi import boxplot_layout_pnbp
+from .visualisasi import fig_treemap
+
+
 
 card_style = {'width': '25rem', 'margin': '1rem'}
+# List kolom yang dapat dipilih
+available_columns = ['volume', 'pnbp_total', 'pnbp_DR', 'pnbp_PSDH', 'volume_bulat', 'volume_olahan']
+# Daftar opsi px
+available_plots = ['scatter', 'bar', 'box', 'line', 'area',  'density_contour']
+
 
 layout_graph = html.Div([
     dbc.Container([
-        
         html.Div(className="mt-4"),
+        
         dbc.Row([
             dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12)
         ]),
+        
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H1('KED - Total PNBP per Tahun dan Provinsi')),
+                    dbc.CardHeader(html.H1('Total PNBP per Tahun dan Provinsi')),
                     dbc.CardBody([
-                        dcc.Graph(id='graph-ked', figure=fig_ked_pnbp)
-                        
+                        dcc.Dropdown(
+                            id='plot-dropdown',
+                            options=[{'label': plot.capitalize(), 'value': plot} for plot in available_plots],
+                            value='bar'
+                        ),
+                        dcc.Graph(id='plot-graph')
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
@@ -36,9 +47,14 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H2('Grafik Peta')),
+                    dbc.CardHeader(html.H2('Grafik Boxplot PNBP')),
                     dbc.CardBody([
-                        dcc.Graph(figure=fig_peta)
+                        dcc.Dropdown(
+                            id='column-dropdown',
+                            options=[{'label': col, 'value': col} for col in available_columns],
+                            value=available_columns[0]
+                        ),
+                        dcc.Graph(id='pnbp-box-plot')
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
@@ -54,18 +70,32 @@ layout_graph = html.Div([
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
         ], className='mb-4'),
+
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H2('Grafik 3D')),
+                    dbc.CardHeader(html.H2('Grafik Treemap Wilayah Kawasan Hutan')),
                     dbc.CardBody([
-                        dcc.Graph(figure=boxplot_layout_pnbp)
+                        dcc.Graph(figure=fig_treemap)
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
         ], className='mb-4'),
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H2('Daerah Yang Dicurigai')),
+                    dbc.CardBody([
+                        dcc.Graph(figure=fig_peta)
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
+        
     ])
 ])
+
 
 
 

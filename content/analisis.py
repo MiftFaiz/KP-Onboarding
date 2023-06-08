@@ -114,4 +114,5 @@ scaled_data = pd.DataFrame(
     )
 
 scaled_pnbp_KP = pd.concat([pnbp_kawasan_produksi.drop(columns=scaled_data.columns), scaled_data],axis=1)
-print(scaled_pnbp_KP)
+
+

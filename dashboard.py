@@ -3,7 +3,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import plotly.graph_objs as go
-import pandas as pd
+import plotly.express as px
 from template.navbar import navbar
 from template.footer import footer
 from content.v_data import layout_graph as data
@@ -13,6 +13,8 @@ from content.v_data import table_produksi_olahan_layout as table_olahan
 from content.v_data import table_pnbp_layout
 from content.v_home import layout as home
 from content.analisis import pnbp_tahunan
+from content.analisis import pnbp_kawasan_produksi
+from content.visualisasi import kde_data_pnbp
 from content.visualisasi import generate_figure
 import dash
 import dash_table
@@ -181,8 +183,48 @@ def update_table(tahun):
     return [table]
 
 
+# Mengatur tampilan box plot sesuai dengan pilihan dropdown
+@app.callback(
+    dash.dependencies.Output('pnbp-box-plot', 'figure'),
+    dash.dependencies.Input('column-dropdown', 'value')
+)
+def update_box_plot(column):
+    box_plot = go.Box(
+        x=pnbp_kawasan_produksi['provinsi'],
+        y=pnbp_kawasan_produksi[column],
+        name=column
+    )
+    
+    layout = go.Layout(
+        height=600,
+        width=800,
+        title="Visualisasi PNBP terhadap Produksi"
+    )
+    
+    fig = go.Figure(data=[box_plot], layout=layout)
+    return fig
 
+# Mengatur callback untuk mengubah jenis grafik
+@app.callback(
+    dash.dependencies.Output('plot-graph', 'figure'),
+    [dash.dependencies.Input('plot-dropdown', 'value')]
+)
 
+def update_plot(plot):
+    if plot == 'scatter':
+        fig = px.scatter(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Scatter Plot - Total PNBP per Tahun dan Provinsi')
+    elif plot == 'bar':
+        fig = px.bar(kde_data_pnbp, x='provinsi', y='pnbp', title='Bar Plot - Total PNBP per Provinsi')
+    elif plot == 'box':
+        fig = px.box(kde_data_pnbp, x='provinsi', y='pnbp', title='Box Plot - Total PNBP per Provinsi')
+    elif plot == 'line':
+        fig = px.line(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Line Plot - Total PNBP per Tahun dan Provinsi')
+    elif plot == 'area':
+        fig = px.area(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Area Plot - Total PNBP per Tahun dan Provinsi')
+    elif plot == 'density_contour':
+        fig = px.density_contour(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='KDE - Total PNBP per Tahun dan Provinsi')
+
+    return fig
 
 if __name__ == "__main__":
     try:

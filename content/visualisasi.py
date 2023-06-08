@@ -4,10 +4,13 @@ import dash_core_components as dcc
 import numpy as np
 import plotly.express as px
 import plotly.io as pio
-import dash_html_components as html
 from .analisis import kawasan_pnbp 
+from .analisis import kawasan 
+from .analisis import pnbp_kawasan_produksi 
 from .analisis import pnbp_tahunan 
-from .analisis import scaled_pnbp_KP 
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 
 
 available_provinces = kawasan_pnbp['provinsi'].unique().tolist()
@@ -43,20 +46,21 @@ fig_peta = go.Figure(data=go.Choropleth(
     colorscale='Blues',  # Skala warna
     autocolorscale=False,  # Menonaktifkan otomatisasi skala warna
     marker_line_color='white',  # Warna garis batas wilayah
-    colorbar_title='Jumlah',  # Judul colorbar
+    showscale=False  # Menghilangkan bar warna di sebelah kanan
 ))
+
 
 fig_peta.update_layout(
     title_text='Jumlah dalam setiap provinsi di Indonesia',
     geo=dict(
         showframe=False,  # Menyembunyikan bingkai peta
         showcoastlines=False,  # Menyembunyikan garis pantai
-        projection_type='natural earth',  # Tipe proyeksi peta
-        center=dict(lat=-8, lon=135),  # Koordinat pusat peta 
-        scope='asia'  # Level zoom untuk tampilan Indonesia
+        projection_type='natural earth',  # Tipe proyeksi peta 
+        scope='asia'  
     ),
     width=800,  # Lebar peta dalam piksel
-    height=600  # Tinggi peta dalam piksel
+    height=600,  # Tinggi peta dalam piksel
+    margin=dict(l=0, r=0, t=0, b=0)  # Mengatur margin ke nol untuk mengisi seluruh area yang tersedia
 )
 
 # Menambahkan scattergeo trace untuk tanda lingkaran merah
@@ -103,61 +107,40 @@ fig_3d.update_layout(
 )
 
 # Group data by tahun, provinsi, and calculate total pnbp
-ked_data_pnbp = pnbp_tahunan.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
+kde_data_pnbp = pnbp_tahunan.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
 
-# Create KED figure using scatter plot
-fig_ked_pnbp = px.scatter(ked_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='KED - Total PNBP per Tahun dan Provinsi')
+# Create kde figure using scatter plot
+fig_kde_pnbp = px.density_contour(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Total PNBP per Tahun dan Provinsi')
 
 # Update figure layout
-fig_ked_pnbp.update_layout(xaxis_title='Tahun', yaxis_title='Total PNBP')
+fig_kde_pnbp.update_layout(xaxis_title='Tahun', yaxis_title='Total PNBP')
 
-pio.templates.default = "plotly_dark"
+# Filter kolom yang ingin ditampilkan
+filtered_columns = ['volume', 'pnbp_total', 'pnbp_DR', 'pnbp_PSDH', 'volume_bulat', 'volume_olahan']
 
-# Buat dropdown options
-dropdown_options_Jenis = [
-    {'label': 'Volume Total', 'value': 'volume_total'},
-    {'label': 'Volume Olahan', 'value': 'volume_olahan'},
-    {'label': 'Volume Bulat', 'value': 'volume_bulat'},
-    {'label': 'PNBP PSDH', 'value': 'pnbp_PSDH'},
-    {'label': 'PNBP DR', 'value': 'pnbp_DR'},
-    {'label': 'PNBP Total', 'value': 'pnbp_total'}
-]
-
-# Fungsi untuk menggambar boxplot
-def draw_boxplot(selected_x):
-    fig = go.Figure()
-
-    fig.add_trace(go.Box(
-        x=scaled_pnbp_KP[selected_x],
-        y=scaled_pnbp_KP['provinsi'],
-        name=selected_x,
-        orientation='h'
-    ))
-
-    fig.update_layout(
-        title="Boxplot",
-        yaxis=dict(title="Provinsi"),
-        xaxis=dict(title=selected_x),
-        height=600,
-        margin=dict(l=20, r=20, t=40, b=20),
-        template="plotly_dark"
+# Membuat list objek Box untuk setiap kolom yang difilter
+box_plots = []
+for column in filtered_columns:
+    box_plot = go.Box(
+        x=pnbp_kawasan_produksi['provinsi'],
+        y=pnbp_kawasan_produksi[column],
+        name=column
     )
+    box_plots.append(box_plot)
 
-# Buat dropdown menu
-dropdown = dcc.Dropdown(
-    id='x-dropdown',
-    options=dropdown_options_Jenis,
-    value='volume_total'
+# Membuat layout dan menampilkan box plot
+fig_pnbp_box = go.Layout(
+    height=600,
+    width=800,
+    title="Visualisasi PNBP terhadap Produksi"
 )
 
-# Buat boxplot
-boxplot = dcc.Graph(
-    id='boxplot'
-)
+# Membuat treemap menggunakan Plotly
+fig_treemap = px.treemap(kawasan, path=['provinsi'], values='area')
 
-boxplot_layout_pnbp = html.Div([
-    html.H1("Boxplot PNBP"),
-    html.Label("Pilih x:"),
-    dropdown,
-    boxplot
-])
+# Update layout
+fig_treemap.update_layout(
+    title='Treemap - Kawasan',
+    height=600,
+    width=800
+)
