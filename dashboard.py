@@ -21,6 +21,9 @@ import dash_table
 # Buat layout dashboard dengan Dash
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
+
+
+
 table_layout = dbc.Container(
     [
         navbar,
