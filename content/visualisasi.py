@@ -1,8 +1,13 @@
 import plotly.graph_objects as go
 import pandas as pd
-from .analisis import kawasan_pnbp 
+import dash_core_components as dcc
 import numpy as np
-
+import plotly.express as px
+import plotly.io as pio
+import dash_html_components as html
+from .analisis import kawasan_pnbp 
+from .analisis import pnbp_tahunan 
+from .analisis import scaled_pnbp_KP 
 
 
 available_provinces = kawasan_pnbp['provinsi'].unique().tolist()
@@ -96,3 +101,63 @@ fig_3d.update_layout(
     ),
     title='3D Scatter Plot'
 )
+
+# Group data by tahun, provinsi, and calculate total pnbp
+ked_data_pnbp = pnbp_tahunan.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
+
+# Create KED figure using scatter plot
+fig_ked_pnbp = px.scatter(ked_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='KED - Total PNBP per Tahun dan Provinsi')
+
+# Update figure layout
+fig_ked_pnbp.update_layout(xaxis_title='Tahun', yaxis_title='Total PNBP')
+
+pio.templates.default = "plotly_dark"
+
+# Buat dropdown options
+dropdown_options_Jenis = [
+    {'label': 'Volume Total', 'value': 'volume_total'},
+    {'label': 'Volume Olahan', 'value': 'volume_olahan'},
+    {'label': 'Volume Bulat', 'value': 'volume_bulat'},
+    {'label': 'PNBP PSDH', 'value': 'pnbp_PSDH'},
+    {'label': 'PNBP DR', 'value': 'pnbp_DR'},
+    {'label': 'PNBP Total', 'value': 'pnbp_total'}
+]
+
+# Fungsi untuk menggambar boxplot
+def draw_boxplot(selected_x):
+    fig = go.Figure()
+
+    fig.add_trace(go.Box(
+        x=scaled_pnbp_KP[selected_x],
+        y=scaled_pnbp_KP['provinsi'],
+        name=selected_x,
+        orientation='h'
+    ))
+
+    fig.update_layout(
+        title="Boxplot",
+        yaxis=dict(title="Provinsi"),
+        xaxis=dict(title=selected_x),
+        height=600,
+        margin=dict(l=20, r=20, t=40, b=20),
+        template="plotly_dark"
+    )
+
+# Buat dropdown menu
+dropdown = dcc.Dropdown(
+    id='x-dropdown',
+    options=dropdown_options_Jenis,
+    value='volume_total'
+)
+
+# Buat boxplot
+boxplot = dcc.Graph(
+    id='boxplot'
+)
+
+boxplot_layout_pnbp = html.Div([
+    html.H1("Boxplot PNBP"),
+    html.Label("Pilih x:"),
+    dropdown,
+    boxplot
+])

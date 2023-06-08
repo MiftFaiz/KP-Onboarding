@@ -2,13 +2,15 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from .visualisasi import available_provinces
+# from .visualisasi import available_provinces
 from .analisis import unique_products
 from .analisis import data_pnbp
 from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
 from .visualisasi import fig_peta
 from .visualisasi import fig_3d
+from .visualisasi import fig_ked_pnbp
+from .visualisasi import boxplot_layout_pnbp
 
 card_style = {'width': '25rem', 'margin': '1rem'}
 
@@ -22,14 +24,10 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H2('Grafik PNBP')),
+                    dbc.CardHeader(html.H1('KED - Total PNBP per Tahun dan Provinsi')),
                     dbc.CardBody([
-                        dcc.Dropdown(
-                            id='dropdown-provinsi',
-                            options=[{'label': provinsi, 'value': provinsi} for provinsi in available_provinces],
-                            value=available_provinces[0]
-                        ),
-                        dcc.Graph(id='grafik-pnbp')
+                        dcc.Graph(id='graph-ked', figure=fig_ked_pnbp)
+                        
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
@@ -52,6 +50,16 @@ layout_graph = html.Div([
                     dbc.CardHeader(html.H2('Grafik 3D')),
                     dbc.CardBody([
                         dcc.Graph(figure=fig_3d)
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H2('Grafik 3D')),
+                    dbc.CardBody([
+                        dcc.Graph(figure=boxplot_layout_pnbp)
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),

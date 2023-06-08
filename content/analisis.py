@@ -1,4 +1,7 @@
 import pandas as pd
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+
 
 # Load Data
 data_pnbp = pd.read_csv('Dataset/pnbp.csv')
@@ -57,8 +60,47 @@ unique_jenis_olahan = data_produksi_olahan['jenis'].unique()
 
 available_provinces = kawasan_pnbp['provinsi'].unique().tolist()
 
+
+
 data_pnbp["provinsi"] = data_pnbp["provinsi"].replace(["Kalimantan Timur"], "Kalimantan Timur dan Utara")
 data_pnbp["provinsi"] = data_pnbp["provinsi"].replace(["Kalimantan Utara"], "Kalimantan Timur dan Utara")
 new_pnbp = data_pnbp.groupby(["tahun", "bulan", "provinsi", "jenis"], sort=False)["pnbp"].sum().reset_index()
 new_pnbp = new_pnbp.drop(new_pnbp[(new_pnbp['tahun'] == 2023) & (new_pnbp['bulan'].isin(['Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']))].index)
 pnbp_tahunan = new_pnbp.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
+
+# One Hot Encoding Data PNBP buat produksi
+enc_pnbp_p = OneHotEncoder(sparse_output=False).fit(pnbp_produksi.drop(columns=['tahun','bulan', 'provinsi','pnbp']))
+encoded_pnbp_p = enc_pnbp_p.transform(pnbp_produksi.drop(columns=['tahun','pnbp','bulan', 'provinsi']))
+
+encoded_df = pd.DataFrame(
+    encoded_pnbp_p,
+    columns=enc_pnbp_p.get_feature_names_out()
+    )
+pnbp_produksi = pd.concat([pnbp_produksi.drop(columns=['jenis']), encoded_df], axis=1)
+
+pnbp_produksi = pnbp_produksi.groupby(['provinsi', 'tahun', 'bulan'], sort=False).sum().reset_index()
+
+print(pnbp_produksi.columns)
+pnbp_produksi['pnbp_total'] = pnbp_produksi['pnbp_IURAN'] + pnbp_produksi['pnbp_DR'] + pnbp_produksi['pnbp_PSDH'] +pnbp_produksi['pnbp_DPEH']
+pnbp_produksi.loc[
+    (pnbp_produksi['jenis_DPEH'] > 1 )|
+    (pnbp_produksi['jenis_DR'] > 1 )|
+    (pnbp_produksi['jenis_IURAN'] > 1 )|
+    (pnbp_produksi['jenis_DPEH'] > 1 )|
+    (pnbp_produksi['jenis_PSDH'] > 1 ),["jenis_DR", "jenis_IURAN","jenis_DPEH","jenis_PSDH"]] = 1.0
+
+pnbp_p = pd.merge(pnbp_produksi, produksi, how='left',on=['tahun', 'bulan', 'provinsi'])
+selisih = pnbp_p['pnbp_total'] - pnbp_p['volume_total']
+
+
+pnbp_kawasan_produksi = pd.merge(pnbp_p, kawasan, how='left', on=['provinsi']).fillna(0)
+
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(pnbp_kawasan_produksi.drop(columns=['provinsi','bulan', 'tahun', 'jenis_DPEH', 'jenis_IURAN', 'jenis_PSDH', 'jenis_DR']))
+
+scaled_data = pd.DataFrame(
+    scaled_data,
+    columns=scaler.get_feature_names_out()
+    )
+
+scaled_pnbp_KP = pd.concat([pnbp_kawasan_produksi.drop(columns=scaled_data.columns), scaled_data],axis=1)
