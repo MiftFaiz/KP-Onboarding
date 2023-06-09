@@ -4,6 +4,6 @@
 # Ignore Dataset directory
 Dataset/
 
-content/_pycache_
-_pycache_
-template/_pycache_  
+content/__pycache__
+__pycache__
+template/__pycache__  
