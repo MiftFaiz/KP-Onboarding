@@ -8,10 +8,11 @@ from .analisis import data_pnbp
 from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
 from .visualisasi import fig_peta
-from .visualisasi import available_provinces
+from .visualisasi import fig_box_area
 from .visualisasi import available_provinces_produksi
 from .visualisasi import fig_3d
 from .visualisasi import fig_treemap
+
 
 
 
@@ -29,6 +30,16 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
         ]),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H2('Box Plot Claster Area')),
+                    dbc.CardBody([
+                        dcc.Graph(figure=fig_box_area),
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
         
         dbc.Row([
             dbc.Col([

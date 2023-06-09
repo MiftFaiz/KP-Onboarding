@@ -218,3 +218,12 @@ fig_treemap.update_layout(
     height=600,
     width=800
 )
+
+data_terpilih = pnbp_kawasan_produksi[pnbp_kawasan_produksi['tahun'] == 2023]
+
+fig_box_area = px.box(data_terpilih, x="cluster", y="area", color="cluster",
+             title=f"Boxplot Area")
+
+fig_box_area.update_layout(height=600, width=800)
+
+
