@@ -8,6 +8,8 @@ from .analisis import data_pnbp
 from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
 from .visualisasi import fig_peta
+from .visualisasi import available_provinces
+from .visualisasi import available_provinces_produksi
 from .visualisasi import fig_3d
 from .visualisasi import fig_treemap
 
@@ -25,20 +27,50 @@ layout_graph = html.Div([
         html.Div(className="mt-4"),
         
         dbc.Row([
-            dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12)
+            dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
         ]),
         
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H1('Total Produksi per Tahun dan Provinsi')),
+                    dbc.CardBody([
+                        dcc.Dropdown(
+                            id='dropdown-provinsi',
+                            options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
+                        ),
+                        dcc.Graph(id='grafik-produksi')
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H1('Boxplot Produksi per Tahun dan Provinsi')),
+                    dbc.CardBody([
+                        dcc.Dropdown(
+                            id='dropdown-provinsi',
+                            options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
+                        ),
+                        dcc.Graph(id='box-produksi')
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
+
         dbc.Row([
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(html.H1('Total PNBP per Tahun dan Provinsi')),
                     dbc.CardBody([
                         dcc.Dropdown(
-                            id='plot-dropdown',
+                            id='plot-dropdown-pnbp',
                             options=[{'label': plot.capitalize(), 'value': plot} for plot in available_plots],
                             value='bar'
                         ),
-                        dcc.Graph(id='plot-graph')
+                        dcc.Graph(id='plot-graph-pnbp')
                     ])
                 ], className="mx-auto", style={'width': '75%'})
             ], width=12),
