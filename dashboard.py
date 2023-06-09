@@ -15,7 +15,9 @@ from content.v_home import layout as home
 from content.analisis import pnbp_tahunan
 from content.analisis import pnbp_kawasan_produksi
 from content.visualisasi import kde_data_pnbp
-from content.visualisasi import generate_figure
+from content.visualisasi import generate_figure_pnbp
+from content.visualisasi import generate_figure_produksi
+from content.visualisasi import generate_boxplot_produksi
 import dash
 import dash_table
 
@@ -158,15 +160,33 @@ def display_page(pathname):
         return table_layout
     else:
         return '404 - Halaman tidak ditemukan'
+    
+
 
 @app.callback(
     dash.dependencies.Output('grafik-pnbp', 'figure'),
     [dash.dependencies.Input('dropdown-provinsi', 'value')]
 )
 def update_figure(provinsi):
-    fig_kawasan_pnbp = generate_figure(provinsi)
+    fig_kawasan_pnbp = generate_figure_pnbp(provinsi)
     return fig_kawasan_pnbp
 
+@app.callback(
+    dash.dependencies.Output('grafik-produksi', 'figure'),
+    [dash.dependencies.Input('dropdown-provinsi', 'value')]
+)
+def update_figure(provinsi):
+    fig_kawasan_produksi = generate_figure_produksi(provinsi)
+    return fig_kawasan_produksi
+
+@app.callback(
+    dash.dependencies.Output('box-produksi', 'figure'),
+    [dash.dependencies.Input('dropdown-provinsi', 'value')]
+)
+def update_figure(provinsi):
+    fig_kawasan_prodik = generate_boxplot_produksi(provinsi)
+    return fig_kawasan_prodik
+    
 @app.callback(
     dash.dependencies.Output('table-container', 'children'),
     [dash.dependencies.Input('dropdown-tahun', 'value')]
@@ -206,8 +226,8 @@ def update_box_plot(column):
 
 # Mengatur callback untuk mengubah jenis grafik
 @app.callback(
-    dash.dependencies.Output('plot-graph', 'figure'),
-    [dash.dependencies.Input('plot-dropdown', 'value')]
+    dash.dependencies.Output('plot-graph-pnbp', 'figure'),
+    [dash.dependencies.Input('plot-dropdown-pnbp', 'value')]
 )
 
 def update_plot(plot):
@@ -223,6 +243,28 @@ def update_plot(plot):
         fig = px.area(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Area Plot - Total PNBP per Tahun dan Provinsi')
     elif plot == 'density_contour':
         fig = px.density_contour(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='KDE - Total PNBP per Tahun dan Provinsi')
+
+    return fig
+
+# Mengatur callback untuk mengubah jenis grafik
+@app.callback(
+    dash.dependencies.Output('plot-graph-produksi', 'figure'),
+    [dash.dependencies.Input('plot-dropdown-produksi', 'value')]
+)
+
+def update_plot(plot):
+    if plot == 'scatter':
+        fig = px.scatter(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Scatter Plot - Produksi per Tahun dan Provinsi')
+    elif plot == 'bar':
+        fig = px.bar(kde_data_pnbp, x='provinsi', y='pnbp', title='Bar Plot - Produksi per Provinsi')
+    elif plot == 'box':
+        fig = px.box(kde_data_pnbp, x='provinsi', y='pnbp', title='Box Plot - Produksi per Provinsi')
+    elif plot == 'line':
+        fig = px.line(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Line Plot - Produksi per Tahun dan Provinsi')
+    elif plot == 'area':
+        fig = px.area(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='Area Plot - Produksi per Tahun dan Provinsi')
+    elif plot == 'density_contour':
+        fig = px.density_contour(kde_data_pnbp, x='tahun', y='pnbp', color='provinsi', title='KDE - Produksi per Tahun dan Provinsi')
 
     return fig
 

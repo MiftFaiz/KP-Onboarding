@@ -5,6 +5,7 @@ import numpy as np
 import plotly.express as px
 import plotly.io as pio
 from .analisis import kawasan_pnbp 
+from .analisis import produksi 
 from .analisis import kawasan 
 from .analisis import pnbp_kawasan_produksi 
 from .analisis import pnbp_tahunan 
@@ -14,7 +15,8 @@ from plotly.subplots import make_subplots
 
 
 available_provinces = kawasan_pnbp['provinsi'].unique().tolist()
-def generate_figure(provinsi):
+available_provinces_produksi = produksi['provinsi'].unique().tolist()
+def generate_figure_pnbp(provinsi):
     fig_kawasan_pnbp = go.Figure()
     for i in range(2018, 2023):
         tes = kawasan_pnbp.loc[(kawasan_pnbp['provinsi'] == provinsi) & (kawasan_pnbp['tahun'] == i)]
@@ -27,6 +29,39 @@ def generate_figure(provinsi):
         yaxis_title="PNBP"
     )
     return fig_kawasan_pnbp
+
+def generate_figure_produksi(provinsi):
+    fig_kawasan_produksi = go.Figure()
+    for i in range(2018, 2023):
+        tes = produksi.loc[(produksi['provinsi'] == provinsi) & (produksi['tahun'] == i)]
+        if not tes.empty:
+            fig_kawasan_produksi.add_trace(go.Bar(x=tes['bulan'], y=tes['volume'], name=f'Produksi Tahun {i}'))
+    fig_kawasan_produksi.update_layout(
+        title=f"Grafik Produksi - Provinsi {provinsi}",
+        xaxis_title="Bulan",
+        yaxis_title="Produksi"
+    )
+    return fig_kawasan_produksi
+
+def generate_boxplot_produksi(provinsi):
+    filtered_data = produksi[produksi['provinsi'] == provinsi]
+    fig_box_produksi = go.Figure()
+    fig_box_produksi.add_trace(go.Box(
+        x=filtered_data['tahun'],
+        y=filtered_data['volume'],
+        name='Produksi',
+        boxpoints='all',
+        marker=dict(color='blue'),
+        jitter=0.3,
+        pointpos=-1.8
+    ))
+    fig_box_produksi.update_layout(
+        title=f'Boxplot Produksi - Provinsi {provinsi}',
+        xaxis_title='Tahun',
+        yaxis_title='Volume Produksi'
+    )
+    return fig_box_produksi
+
 
 data_peta = [
     {'provinsi_peta': 'Aceh', 'jumlah': 100},

@@ -56,6 +56,8 @@ kawasan = kawasan.groupby(['provinsi'], sort=False)['area'].sum().reset_index()
 kawasan_pnbp = pd.merge(new_pnbp, kawasan, how='left', on=['provinsi'])
 kawasan_pnbp.fillna(0, inplace=True)
 
+print(produksi.columns)
+
 unique_products = data_ekspor['produk'].unique()
 
 unique_jenis_bb = data_pemenuhan_bb['jenis'].unique()
