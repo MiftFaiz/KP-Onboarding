@@ -56,7 +56,7 @@ kawasan = kawasan.groupby(['provinsi'], sort=False)['area'].sum().reset_index()
 kawasan_pnbp = pd.merge(new_pnbp, kawasan, how='left', on=['provinsi'])
 kawasan_pnbp.fillna(0, inplace=True)
 
-print(produksi.columns)
+
 
 unique_products = data_ekspor['produk'].unique()
 
@@ -159,3 +159,5 @@ pnbp_kawasan_produksi['cluster'] = label
 data_clusters = []
 for i in u_labels:
   data_clusters.append(pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['cluster'] == i])
+
+  print(data_clusters)

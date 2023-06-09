@@ -181,7 +181,7 @@ def update_figure(provinsi):
 
 @app.callback(
     dash.dependencies.Output('box-produksi', 'figure'),
-    [dash.dependencies.Input('dropdown-provinsi', 'value')]
+    [dash.dependencies.Input('dropdown-provinsi-box', 'value')]
 )
 def update_figure(provinsi):
     fig_kawasan_prodik = generate_boxplot_produksi(provinsi)

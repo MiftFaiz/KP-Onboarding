@@ -51,7 +51,7 @@ layout_graph = html.Div([
                     dbc.CardHeader(html.H1('Boxplot Produksi per Tahun dan Provinsi')),
                     dbc.CardBody([
                         dcc.Dropdown(
-                            id='dropdown-provinsi',
+                            id='dropdown-provinsi-box',
                             options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
                         ),
                         dcc.Graph(id='box-produksi')

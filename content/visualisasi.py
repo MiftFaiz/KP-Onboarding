@@ -8,6 +8,7 @@ from .analisis import kawasan_pnbp
 from .analisis import produksi 
 from .analisis import kawasan 
 from .analisis import pnbp_kawasan_produksi 
+from .analisis import data_clusters 
 from .analisis import pnbp_tahunan 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -140,6 +141,44 @@ fig_3d.update_layout(
     ),
     title='3D Scatter Plot'
 )
+
+
+# # Ambil contoh data volume PNBP area
+# volume_pnbp_area = np.random.randn(100)
+# cluster_labels = np.random.randint(0, 4, size=100)
+
+
+# # Definisikan warna untuk setiap cluster
+# colors = ['red', 'green', 'blue', 'yellow']
+
+# # Buat 3D scatter plot
+# fig_3d = go.Figure()
+
+# # Tambahkan data scatter plot untuk setiap cluster
+# for cluster, data in enumerate(pnbp_kawasan_produksi):
+#     fig_3d.add_trace(go.Scatter3d(
+#         x=data['volume'],
+#         y=data['pnbp'],
+#         z=data['area'],
+
+#         mode='markers',
+#         marker=dict(
+#             size=8,
+#             color=colors[cluster],
+#             opacity=0.8
+#         ),
+#         name='Cluster {}'.format(cluster)
+#     ))
+
+# # Set layout
+# fig_3d.update_layout(
+#     scene=dict(
+#         xaxis=dict(title='Volume'),
+#         yaxis=dict(title='PNBP'),
+#         zaxis=dict(title='Area'),
+#     ),
+#     title='3D Scatter Plot'
+# )
 
 # Group data by tahun, provinsi, and calculate total pnbp
 kde_data_pnbp = pnbp_tahunan.groupby(['tahun', 'provinsi'], sort=False)['pnbp'].sum().reset_index()
