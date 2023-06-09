@@ -1,7 +1,9 @@
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-
+from sklearn.cluster import KMeans
+from kneed import KneeLocator
+from sklearn.metrics import silhouette_score
+import numpy as np
 
 # Load Data
 data_pnbp = pd.read_csv('Dataset/pnbp.csv')
@@ -115,4 +117,43 @@ scaled_data = pd.DataFrame(
 
 scaled_pnbp_KP = pd.concat([pnbp_kawasan_produksi.drop(columns=scaled_data.columns), scaled_data],axis=1)
 
+# k-means configuration
+kmeans_kwargs = {
+    "init": "random",
+    "n_init": 10,
+    "max_iter": 300,
+    "random_state": 42,
+}
 
+# store k-means inertia with different n_cluster
+sse = []
+for k in range(1, 31):
+  kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
+  kmeans.fit(scaled_data)
+  sse.append(kmeans.inertia_)
+
+# Locate best cluster using elbow method
+kl = KneeLocator(
+    range(1,31),
+    sse,
+    curve="convex",
+    direction="decreasing"
+)
+
+# Create KMeans
+new_kmeans = KMeans(
+    n_clusters=kl.elbow,
+    **kmeans_kwargs
+    )
+
+# fit data
+label = new_kmeans.fit_predict(scaled_data)
+u_labels = np.unique(label)
+
+# store to dataframe
+pnbp_kawasan_produksi['cluster'] = label
+
+# Seperate cluster
+data_clusters = []
+for i in u_labels:
+  data_clusters.append(pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['cluster'] == i])
