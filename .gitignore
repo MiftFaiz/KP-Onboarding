@@ -3,3 +3,7 @@
 
 # Ignore Dataset directory
 Dataset/
+
+content/__pycache__
+__pycache__
+template/__pycache__
