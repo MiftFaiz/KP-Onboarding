@@ -3,12 +3,14 @@ import pandas as pd
 import dash_core_components as dcc
 import numpy as np
 import plotly.express as px
+from .analisis import data_clusters 
 import plotly.io as pio
 from .analisis import kawasan_pnbp 
 from .analisis import produksi 
 from .analisis import kawasan 
 from .analisis import pnbp_kawasan_produksi 
-from .analisis import data_clusters 
+import matplotlib.pyplot as plt
+import seaborn as sns
 from .analisis import pnbp_tahunan 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -219,11 +221,85 @@ fig_treemap.update_layout(
     width=800
 )
 
-data_terpilih = pnbp_kawasan_produksi[pnbp_kawasan_produksi['tahun'] == 2023]
+data_terpilih = pnbp_kawasan_produksi[pnbp_kawasan_produksi['tahun'] == 2019]
+
 
 fig_box_area = px.box(data_terpilih, x="cluster", y="area", color="cluster",
              title=f"Boxplot Area")
 
 fig_box_area.update_layout(height=600, width=800)
 
+critical1_U = data_clusters[4]['area'].quantile(0.25)
+critical2_L = data_clusters[4]['area'].quantile(0.25)
+critical2_U = data_clusters[1]['area'].quantile(0.25)
+critical3_L = data_clusters[1]['area'].quantile(0.25)
+critical3_U = data_clusters[3]['area'].quantile(0.25)
+critical4_U = data_clusters[3]['area'].quantile(0.25)
 
+print(critical1_U)
+print(critical2_L)
+print(critical2_U)
+print(critical3_L)
+print(critical3_U)
+print(critical4_U)
+
+print(pnbp_kawasan_produksi.columns)
+
+region_1 = pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['area'] < critical1_U]
+region_2 = pnbp_kawasan_produksi.loc[(pnbp_kawasan_produksi['area'] < critical2_U) & (pnbp_kawasan_produksi['area'] >= critical2_L)]
+region_3 = pnbp_kawasan_produksi.loc[(pnbp_kawasan_produksi['area'] < critical3_U) & (pnbp_kawasan_produksi['area'] >= critical3_L)]
+region_4 = pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['area'] > critical4_U]
+
+produksi_critical = pnbp_kawasan_produksi.copy()
+
+pnbp_kawasan_produksi['region_Produksi'] = np.where(
+    pnbp_kawasan_produksi['area'] < critical1_U,1,
+    np.where(
+        (pnbp_kawasan_produksi['area'] < critical2_U) & (pnbp_kawasan_produksi['area'] >= critical2_L), 2,
+        np.where(
+            (pnbp_kawasan_produksi['area'] < critical3_U) & (pnbp_kawasan_produksi['area'] >= critical3_L),3,
+            np.where(
+                pnbp_kawasan_produksi['area'] > critical4_U,4,4
+            )
+        )))
+
+pnbp_kawasan_produksi['region_Produksi'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+
+total = pnbp_kawasan_produksi.cluster.count()
+u_labels = pnbp_kawasan_produksi.cluster.unique()
+
+fig_cluster_area = go.Figure()
+for k in u_labels:
+    percentage = []
+    freq = pnbp_kawasan_produksi['region_Produksi'].loc[
+        pnbp_kawasan_produksi['cluster'] == k
+    ].value_counts()
+    
+    fig_cluster_area.add_trace(go.Bar(x=freq.index, y=freq.values, name=f"Cluster {k}"))
+    
+    for i in freq:
+        percentage.append(round((i/total)*100, 2))
+    
+    print(percentage)
+
+fig_cluster_area.update_layout(
+    title="Frekuensi Data Region Produksi dalam Setiap Cluster",
+    xaxis_title="Region Produksi",
+    yaxis_title="Count"
+)
+
+pnbp_kawasan_produksi['region_Produksi'].loc[
+      pnbp_kawasan_produksi['cluster'] == 5
+  ].value_counts().plot(kind='pie',autopct='%1.1f%%')
+
+# Boxplot pnbp terhadap cluster
+plt.title("Boxplot pnbp total tahun 2019")
+sns.boxplot(
+    x=pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['tahun'] == 2019]['cluster'],
+    y=pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['tahun'] == 2019]['area'],
+    data=pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['tahun'] == 2019]
+)
+
+for i in pnbp_kawasan_produksi['cluster'].unique():
+  print('Provinsi Cluster ' + str(i))
+  print(pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['cluster'] == i]['provinsi'].unique(), "\n")

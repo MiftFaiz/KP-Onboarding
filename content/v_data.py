@@ -12,6 +12,7 @@ from .visualisasi import fig_box_area
 from .visualisasi import available_provinces_produksi
 from .visualisasi import fig_3d
 from .visualisasi import fig_treemap
+from .visualisasi import fig_cluster_area
 
 
 
@@ -41,6 +42,20 @@ layout_graph = html.Div([
             ], width=12),
         ], className='mb-4'),
         
+        dbc.Row([
+            dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
+        ]),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H2('Box Plot Claster Area')),
+                    dbc.CardBody([
+                        dcc.Graph(figure=fig_cluster_area),
+                    ])
+                ], className="mx-auto", style={'width': '75%'})
+            ], width=12),
+        ], className='mb-4'),
+
         dbc.Row([
             dbc.Col([
                 dbc.Card([
