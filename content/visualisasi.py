@@ -221,7 +221,7 @@ fig_treemap.update_layout(
     width=800
 )
 
-data_terpilih = pnbp_kawasan_produksi[pnbp_kawasan_produksi['tahun'] == 2019]
+data_terpilih = pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['tahun'] == 2019]
 
 
 fig_box_area = px.box(data_terpilih, x="cluster", y="area", color="cluster",
