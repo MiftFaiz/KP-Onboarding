@@ -1,7 +1,7 @@
 import dash
-import dash_html_components as html
+from dash import html
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
+from dash import dcc
 import plotly.graph_objs as go
 import plotly.express as px
 from template.navbar import navbar
@@ -19,7 +19,7 @@ from content.visualisasi import generate_figure_pnbp
 from content.visualisasi import generate_figure_produksi
 from content.visualisasi import generate_boxplot_produksi
 import dash
-import dash_table
+from dash import dash_table
 
 
 # Buat layout dashboard dengan Dash
@@ -216,8 +216,8 @@ def update_box_plot(column):
     )
     
     layout = go.Layout(
-        height=600,
-        width=800,
+        # height=600,
+        # width=800,
         title="Visualisasi PNBP terhadap Produksi"
     )
     

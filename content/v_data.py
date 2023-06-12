@@ -1,18 +1,17 @@
 
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 # from .visualisasi import available_provinces
 from .analisis import unique_products
 from .analisis import data_pnbp
 from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
 from .visualisasi import fig_peta
-from .visualisasi import fig_box_area
 from .visualisasi import available_provinces_produksi
 from .visualisasi import fig_3d
 from .visualisasi import fig_treemap
-from .visualisasi import fig_cluster_area
+
 
 
 
@@ -34,40 +33,17 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H2('Box Plot Claster Area')),
-                    dbc.CardBody([
-                        dcc.Graph(figure=fig_box_area),
-                    ])
-                ], className="mx-auto", style={'width': '75%'})
-            ], width=12),
-        ], className='mb-4'),
-        
-        dbc.Row([
-            dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
-        ]),
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardHeader(html.H2('Box Plot Claster Area')),
-                    dbc.CardBody([
-                        dcc.Graph(figure=fig_cluster_area),
-                    ])
-                ], className="mx-auto", style={'width': '75%'})
-            ], width=12),
-        ], className='mb-4'),
-
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
                     dbc.CardHeader(html.H1('Total Produksi per Tahun dan Provinsi')),
                     dbc.CardBody([
                         dcc.Dropdown(
                             id='dropdown-provinsi',
                             options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
+                            value='Bali'
                         ),
                         dcc.Graph(id='grafik-produksi')
+                        
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
 
@@ -79,10 +55,11 @@ layout_graph = html.Div([
                         dcc.Dropdown(
                             id='dropdown-provinsi-box',
                             options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
+                            value='Bali'
                         ),
                         dcc.Graph(id='box-produksi')
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
 
@@ -98,7 +75,7 @@ layout_graph = html.Div([
                         ),
                         dcc.Graph(id='plot-graph-pnbp')
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
         
@@ -114,7 +91,7 @@ layout_graph = html.Div([
                         ),
                         dcc.Graph(id='pnbp-box-plot')
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
         
@@ -125,7 +102,7 @@ layout_graph = html.Div([
                     dbc.CardBody([
                         dcc.Graph(figure=fig_3d)
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
 
@@ -136,7 +113,7 @@ layout_graph = html.Div([
                     dbc.CardBody([
                         dcc.Graph(figure=fig_treemap)
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
 
@@ -147,12 +124,14 @@ layout_graph = html.Div([
                     dbc.CardBody([
                         dcc.Graph(figure=fig_peta)
                     ])
-                ], className="mx-auto", style={'width': '75%'})
+                ], className="mx-auto", style={'width': '100%'})
             ], width=12),
         ], className='mb-4'),
         
     ])
 ])
+
+
 
 
 
