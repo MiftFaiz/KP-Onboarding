@@ -160,3 +160,4 @@ data_clusters = []
 for i in u_labels:
   data_clusters.append(pnbp_kawasan_produksi.loc[pnbp_kawasan_produksi['cluster'] == i])
 
+

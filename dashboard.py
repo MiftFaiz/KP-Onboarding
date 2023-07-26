@@ -18,6 +18,7 @@ from content.visualisasi import kde_data_pnbp
 from content.visualisasi import generate_figure_pnbp
 from content.visualisasi import generate_figure_produksi
 from content.visualisasi import generate_boxplot_produksi
+from content.visualisasi import generate_boxplot_pnbp
 import dash
 from dash import dash_table
 
@@ -136,7 +137,7 @@ home_layout = html.Div(
     children=[
         navbar,
         home,
-        footer,
+
     ]
 )
 
@@ -160,9 +161,7 @@ def display_page(pathname):
         return table_layout
     else:
         return '404 - Halaman tidak ditemukan'
-    
-
-
+        
 @app.callback(
     dash.dependencies.Output('grafik-pnbp', 'figure'),
     [dash.dependencies.Input('dropdown-provinsi', 'value')]
@@ -179,6 +178,7 @@ def update_figure(provinsi):
     fig_kawasan_produksi = generate_figure_produksi(provinsi)
     return fig_kawasan_produksi
 
+
 @app.callback(
     dash.dependencies.Output('box-produksi', 'figure'),
     [dash.dependencies.Input('dropdown-provinsi-box', 'value')]
@@ -187,6 +187,14 @@ def update_figure(provinsi):
     fig_kawasan_prodik = generate_boxplot_produksi(provinsi)
     return fig_kawasan_prodik
     
+@app.callback(
+    dash.dependencies.Output('box-pnbp', 'figure'),
+    [dash.dependencies.Input('dropdown-provinsi', 'value')]
+)
+def update_figure(provinsi):
+    fig_box_pnbp = generate_boxplot_pnbp(provinsi)
+    return fig_box_pnbp
+
 @app.callback(
     dash.dependencies.Output('table-container', 'children'),
     [dash.dependencies.Input('dropdown-tahun', 'value')]

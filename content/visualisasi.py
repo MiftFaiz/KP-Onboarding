@@ -9,6 +9,7 @@ from .analisis import kawasan_pnbp
 from .analisis import produksi 
 from .analisis import kawasan 
 from .analisis import pnbp_kawasan_produksi 
+from .analisis import pnbp_kawasan_produksi 
 import matplotlib.pyplot as plt
 import seaborn as sns
 from .analisis import pnbp_tahunan 
@@ -64,6 +65,25 @@ def generate_boxplot_produksi(provinsi):
         yaxis_title='Volume Produksi'
     )
     return fig_box_produksi
+
+def generate_boxplot_pnbp(provinsi):
+    filtered_data = pnbp_kawasan_produksi[pnbp_kawasan_produksi['provinsi'] == provinsi]
+    fig_box_pnbp = go.Figure()
+    fig_box_pnbp.add_trace(go.Box(
+        x=filtered_data['tahun'],
+        y=filtered_data['pnbp_total'],
+        name='PNBP',
+        boxpoints='all',
+        marker=dict(color='blue'),
+        jitter=0.3,
+        pointpos=-1.8
+    ))
+    fig_box_pnbp.update_layout(
+        title=f'Boxplot PNBP - Provinsi {provinsi}',
+        xaxis_title='Tahun',
+        yaxis_title='ONBO Titak'
+    )
+    return fig_box_pnbp
 
 
 data_peta = [

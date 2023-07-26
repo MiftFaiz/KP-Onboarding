@@ -7,6 +7,7 @@ from .analisis import unique_products
 from .analisis import data_pnbp
 from .analisis import unique_jenis_bb
 from .analisis import unique_jenis_olahan
+from .analisis import pnbp_kawasan_produksi
 from .visualisasi import fig_peta
 from .visualisasi import available_provinces_produksi
 from .visualisasi import fig_3d
@@ -21,15 +22,58 @@ card_style = {'width': '25rem', 'margin': '1rem'}
 available_columns = ['volume', 'pnbp_total', 'pnbp_DR', 'pnbp_PSDH', 'volume_bulat', 'volume_olahan']
 # Daftar opsi px
 available_plots = ['scatter', 'bar', 'box', 'line', 'area',  'density_contour']
-
+provinsi = pnbp_kawasan_produksi['provinsi'].nunique()
+volume = pnbp_kawasan_produksi['volume'].sum()
+pnbp_total = pnbp_kawasan_produksi['pnbp_total'].sum()
+volume_formatted = "{:,.0f} m²".format(volume)
+pnbp_total_formatted = "${:,.0f} Bilion".format(pnbp_total / 1000000000)
 
 layout_graph = html.Div([
     dbc.Container([
         html.Div(className="mt-4"),
-        
-        dbc.Row([
-            dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
+                dbc.Row([
+                    dbc.Col(html.H1('PNBP Fraud Detection Dashboard', className='text-center mb-4'), width=12),
+                    html.Div(className="mt-4"),
+                    html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div([
+                            html.P("Jumlah Provinsi:"),
+                            html.H2("{}".format(provinsi), style={'font-family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'font-size': '24px', 'font-weight': 'bold', 'font-style': 'italic'}),
+                        ], className="mt-4")
+                    ],
+                    className="col-3 bg-primary text-white text-center py-2",
+                    style={'margin-right': '10px'}
+                ),
+                html.Div(
+                    [
+                        html.Div([
+                            html.P("Volume Total Produksi:"),
+                            html.H2("{}".format(volume_formatted), style={'font-family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'font-size': '24px', 'font-weight': 'bold', 'font-style': 'italic'}),                        ], className="mt-4")
+                    ],
+                    className="col-3 bg-secondary text-white text-center py-2",
+                    style={'margin-right': '10px'}
+                ),
+                html.Div(
+                    [
+                        html.Div([
+                            html.P("PNBP Total :"),
+                            html.H2("{}".format(pnbp_total_formatted), style={'font-family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'font-size': '24px', 'font-weight': 'bold', 'font-style': 'italic'}),
+                        ], className="mt-4")
+                    ],
+                    className="col-3 bg-info text-white text-center py-2"
+                ),
+            ],
+            className="row mt-4 justify-content-center"
+        )
+
+
+
+
         ]),
+
+        html.Div(className="mt-4"),
         dbc.Row([
             dbc.Col([
                 dbc.Card([
@@ -50,14 +94,28 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H1('Boxplot Produksi per Tahun dan Provinsi')),
+                    dbc.CardHeader(html.H1('Boxplot Produksi dan PNBP per Tahun dan Provinsi')),
                     dbc.CardBody([
                         dcc.Dropdown(
                             id='dropdown-provinsi-box',
                             options=[{'label': plot.capitalize(), 'value': plot} for plot in available_provinces_produksi],
-                            value='Bali'
+                            value='Papua'
                         ),
-                        dcc.Graph(id='box-produksi')
+                        dbc.Row(
+                        [
+                        dbc.Col(
+                            dcc.Graph(
+                                id='box-produksi',  
+                            ),
+                            width=6
+                        ),
+                        dbc.Col(
+                            dcc.Graph(
+                                id='box-pnbp',
+                            ),
+                            width=6
+                        ),
+                        ]),
                     ])
                 ], className="mx-auto", style={'width': '100%'})
             ], width=12),
@@ -66,7 +124,7 @@ layout_graph = html.Div([
         dbc.Row([
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader(html.H1('Total PNBP per Tahun dan Provinsi')),
+                    dbc.CardHeader(html.H1('Total PNBP per Provinsi')),
                     dbc.CardBody([
                         dcc.Dropdown(
                             id='plot-dropdown-pnbp',
@@ -95,16 +153,16 @@ layout_graph = html.Div([
             ], width=12),
         ], className='mb-4'),
         
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardHeader(html.H2('Grafik 3D')),
-                    dbc.CardBody([
-                        dcc.Graph(figure=fig_3d)
-                    ])
-                ], className="mx-auto", style={'width': '100%'})
-            ], width=12),
-        ], className='mb-4'),
+        # dbc.Row([
+        #     dbc.Col([
+        #         dbc.Card([
+        #             dbc.CardHeader(html.H2('Grafik 3D')),
+        #             dbc.CardBody([
+        #                 dcc.Graph(figure=fig_3d)
+        #             ])
+        #         ], className="mx-auto", style={'width': '100%'})
+        #     ], width=12),
+        # ], className='mb-4'),
 
         dbc.Row([
             dbc.Col([
